@@ -1,2 +1,5 @@
 /env
 *.mp3
+build
+dist
+*.spec
