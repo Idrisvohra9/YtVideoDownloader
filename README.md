@@ -1,7 +1,18 @@
-# Getting Started
+# Download YouTube videos to MP3 Using this python script!🎵
 
+### By Tech Achievers :)
 
-> Note: Make sure you have Python and pip installed on your system before following these steps.
+### Key features:
+
+1. Fast downloads from YouTube
+2. Automatic MP3 conversion
+3. No ads or waiting times
+4. Easy graphical user interface
+5. Multiple video downloads
+
+# Getting Started 🚀
+
+## Note: Make sure you have Python and pip installed on your system before following these steps.
 
 Follow these steps to set up and use this repository:
 
