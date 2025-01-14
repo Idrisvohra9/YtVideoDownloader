@@ -40,30 +40,42 @@ class ProgressUpdater:
                 self.pbar.close()
                 self.pbar = None
 
-def download_youtube_audio(video_url):
+def download_youtube(video_url, format_type):
     try:
         progress_updater = ProgressUpdater()
 
-        ydl_opts = {
-            "format": "bestaudio/best",
-            "postprocessors": [
-                {
-                    "key": "FFmpegExtractAudio",
-                    "preferredcodec": "mp3",
-                    "preferredquality": "192",
-                }
-            ],
-            "outtmpl": "music/%(title)s.%(ext)s",
-            "progress_hooks": [progress_updater.hook],
-        }
+        if format_type == "MP3":
+            ydl_opts = {
+                "format": "bestaudio/best",
+                "postprocessors": [
+                    {
+                        "key": "FFmpegExtractAudio",
+                        "preferredcodec": "mp3",
+                        "preferredquality": "192",
+                    }
+                ],
+                "outtmpl": "music/%(title)s.%(ext)s",
+                "progress_hooks": [progress_updater.hook],
+            }
+        else:  # MP4
+            ydl_opts = {
+                "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+                "outtmpl": "videos/%(title)s.%(ext)s",
+                "progress_hooks": [progress_updater.hook],
+            }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(video_url, download=True)  # Change this to True
+            info = ydl.extract_info(video_url, download=True)
             filename = ydl.prepare_filename(info)
 
-        file_path = os.path.join(
-            "music", f"{os.path.splitext(os.path.basename(filename))[0]}.mp3"
-        )
+        if format_type == "MP3":
+            file_path = os.path.join(
+                "music", f"{os.path.splitext(os.path.basename(filename))[0]}.mp3"
+            )
+        else:
+            file_path = os.path.join(
+                "videos", f"{os.path.splitext(os.path.basename(filename))[0]}.mp4"
+            )
 
         def open_file():
             if os.name == "nt":  # For Windows
@@ -75,7 +87,7 @@ def download_youtube_audio(video_url):
         root.update()
         messagebox.showinfo(
             "Success",
-            "Video downloaded and converted successfully! Click OK to open the file.",
+            f"Video downloaded and converted to {format_type} successfully! Click OK to open the file.",
             icon=messagebox.INFO,
         )
         open_file()
@@ -86,9 +98,10 @@ def download_youtube_audio(video_url):
 
 def on_download():
     video_url = url_entry.get()
+    format_type = format_var.get()
 
     # Run the download in a separate thread to prevent UI freezing
-    download_thread = threading.Thread(target=download_youtube_audio, args=(video_url,))
+    download_thread = threading.Thread(target=download_youtube, args=(video_url, format_type))
     download_thread.start()
     status_label.config(text="Download started...")
 
@@ -96,7 +109,7 @@ def on_download():
 # Create the main window
 root = tk.Tk()
 root.title("MP3 Harvest")
-root.geometry("400x540")
+root.geometry("400x580")
 
 # Set the icon using resource_path
 root.iconbitmap(resource_path("assets/icon.ico"))
@@ -108,6 +121,7 @@ style.theme_use("clam")
 style.configure("TLabel", foreground="white", background="#2E2E2E")
 style.configure("TEntry", fieldbackground="#3E3E3E", foreground="white")
 style.configure("TButton", background="#3E3E3E", foreground="white")
+style.configure("TCombobox", fieldbackground="#3E3E3E", foreground="white")
 
 # Create and pack widgets
 img = tk.PhotoImage(file=resource_path("assets/does.png"))
@@ -119,6 +133,13 @@ url_label = ttk.Label(root, text="Enter YouTube URL:")
 url_label.pack(pady=10)
 url_entry = ttk.Entry(root, width=50)
 url_entry.pack()
+
+format_label = ttk.Label(root, text="Select format:")
+format_label.pack(pady=10)
+format_var = tk.StringVar(root)
+format_var.set("MP3")  # default value
+format_dropdown = ttk.Combobox(root, textvariable=format_var, values=["MP3", "MP4"], state="readonly")
+format_dropdown.pack()
 
 download_button = ttk.Button(root, text="Download", command=on_download)
 download_button.pack(pady=20)
