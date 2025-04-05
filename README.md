@@ -12,7 +12,9 @@
 
 # Getting Started 🚀
 
-## Note: Make sure you have Python and pip installed on your system before following these steps.
+## Note: Make sure you have Python and pip installed on your system before following these steps. And you might also need ffmpeg installed in your system, for that use this video as reference to install ffmpeg : (ffmpeg)[https://youtu.be/EyIIvctDhYc]
+
+
 
 Follow these steps to set up and use this repository:
 
